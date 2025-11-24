@@ -14,6 +14,8 @@ style="margin: 0 10px;" >简体中文</a>
 
 https://github.com/user-attachments/assets/b88bf541-0b26-4020-9eec-da79e1734fc9
 
+[PakePlus命令打包文档](./PACKPLUS.md)
+
 ## Features
 
 -   🎐 Approximately 20 times smaller than Electron (less than 5MB!) and 10 times faster.
