@@ -12,7 +12,12 @@
     "devbug": false,
     "version": "0.0.1",
     "preview": "desktop",
-    "platform": ["1-1", "1-2", "2-1", "2-2"],
+    "platform": [
+        "1-1",
+        "1-2",
+        "2-1",
+        "2-2"
+    ],
     "width": 800,
     "height": 600,
     "desc": "",
@@ -135,13 +140,13 @@
         "safeArea": "all"
     },
     "android": {
-        "name": "PakePlus",
-        "showName": "PakePlus",
+        "name": "aistudio-v0.0.1",
+        "showName": "aistudio",
         "version": "0.0.1",
-        "webUrl": "https://juejin.cn/",
-        "id": "com.pakeplus.android",
-        "icon": "./app-icon.png",
-        "input": "./app-icon.png",
+        "webUrl": "https://aistudio.google.com/apps",
+        "id": "www.djh.aistudio.com",
+        "icon": "/Users/lele/Downloads/aistudio.png",
+        "input": "/Users/lele/Downloads/aistudio.png",
         "output": "./res",
         "rounded": true,
         "copyTo": "./app/src/main/res",

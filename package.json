@@ -3,9 +3,13 @@
     "version": "1.0.0",
     "description": "Pake Plus Android",
     "main": "index.js",
+    "bin": {
+        "packplus": "./scripts/packplus.cjs"
+    },
     "scripts": {
         "pp:worker": "node ./scripts/ppworker.cjs",
-        "restore": "git restore ."
+        "restore": "git restore .",
+        "packplus": "node ./scripts/packplus.cjs"
     },
     "keywords": [
         "pakeplus",
