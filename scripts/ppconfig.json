@@ -140,11 +140,11 @@
         "safeArea": "all"
     },
     "android": {
-        "name": "aistudio-v0.0.3",
+        "name": "aistudio-v0.0.4",
         "showName": "aistudio",
-        "version": "0.0.3",
+        "version": "0.0.4",
         "webUrl": "https://aistudio.google.com/apps",
-        "id": "www.djh.aistudio.com",
+        "id": "com.aistudio.djh",
         "icon": "/Users/lele/Downloads/aistudio.png",
         "input": "/Users/lele/Downloads/aistudio.png",
         "output": "./res",
