@@ -1,9 +1,9 @@
 const fs = require('fs-extra')
 const path = require('path')
-const { execSync } = require('child_process')
+const sharp = require('sharp')
 const ppconfig = require('./ppconfig.json')
 
-function generateAdaptiveIcons(input, output) {
+async function generateAdaptiveIcons(input, output) {
     const densities = {
         'mipmap-mdpi': 48,
         'mipmap-hdpi': 72,
@@ -28,19 +28,36 @@ function generateAdaptiveIcons(input, output) {
         const backgroundFile = path.join(dir, 'ic_launcher_background.png')
         const foregroundFile = path.join(dir, 'ic_launcher_foreground.png')
 
-        // linux只能convert， 背景：纯色填充（全覆盖）
-        execSync(
-            `convert -size ${size}x${size} canvas:"${bgColor}" ${backgroundFile}`
-        )
+        // 使用 sharp 生成背景：纯色填充
+        await sharp({
+            create: {
+                width: size,
+                height: size,
+                channels: 4,
+                background: bgColor
+            }
+        })
+        .png()
+        .toFile(backgroundFile)
 
-        // 前景大小 = 图标尺寸 × 0.75
+        // 前景大小 = 图标尺寸 × 前景缩放比例
         const fgSize = Math.round(size * foregroundScale)
 
-        // 前景：缩放到安全区域，居中，四周自动留边
-        execSync(
-            `convert "${input}" -resize ${fgSize}x${fgSize} ` +
-                `-gravity center -background none -extent ${size}x${size} ${foregroundFile}`
-        )
+        // 使用 sharp 生成前景：缩放到安全区域，居中，四周自动留边
+        await sharp(input)
+            .resize(fgSize, fgSize, {
+                fit: 'contain',
+                background: { r: 0, g: 0, b: 0, alpha: 0 }
+            })
+            .extend({
+                top: Math.round((size - fgSize) / 2),
+                bottom: Math.round((size - fgSize) / 2),
+                left: Math.round((size - fgSize) / 2),
+                right: Math.round((size - fgSize) / 2),
+                background: { r: 0, g: 0, b: 0, alpha: 0 }
+            })
+            .png()
+            .toFile(foregroundFile)
     }
 
     // 生成 Adaptive Icon XML (放到 mipmap-anydpi-v26)
@@ -310,7 +327,7 @@ const main = async () => {
     } = ppconfig.android
 
     const outPath = path.resolve(output)
-    generateAdaptiveIcons(input, outPath)
+    await generateAdaptiveIcons(input, outPath)
 
     const dest = path.resolve(copyTo)
     await fs.copy(outPath, dest, { overwrite: true })
