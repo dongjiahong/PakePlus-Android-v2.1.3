@@ -62,16 +62,51 @@ program
             execSync('npm run pp:worker', { stdio: 'inherit', cwd: path.join(__dirname, '..') })
 
             if (!options.skipGit) {
-                // Git操作
                 const tagName = `${options.appName}-v${options.appVersion}`
                 const commitMsg = `build: 打包 ${options.appName} v${options.appVersion}\n\n- URL: ${options.url}\n- 包名: ${options.appFlag}`
 
-                console.log('\n📝 提交代码到Git...')
-                execSync('git add .', { stdio: 'inherit', cwd: path.join(__dirname, '..') })
-                execSync(`git commit -m "${commitMsg}"`, { stdio: 'inherit', cwd: path.join(__dirname, '..') })
+                // 检查是否有变更
+                console.log('\n📝 检查文件变更...')
+                execSync('git add .', { cwd: path.join(__dirname, '..') })
 
+                const gitStatus = execSync('git status --porcelain', {
+                    cwd: path.join(__dirname, '..'),
+                    encoding: 'utf8'
+                })
+
+                if (gitStatus.trim()) {
+                    console.log('发现文件变更，提交代码...')
+                    execSync(`git commit -m "${commitMsg}"`, { stdio: 'inherit', cwd: path.join(__dirname, '..') })
+                } else {
+                    console.log('没有文件变更，跳过提交')
+                }
+
+                // 检查 tag 是否已存在
                 console.log(`\n🏷️  创建Tag: ${tagName}`)
-                execSync(`git tag ${tagName}`, { stdio: 'inherit', cwd: path.join(__dirname, '..') })
+                try {
+                    const existingTags = execSync('git tag', {
+                        cwd: path.join(__dirname, '..'),
+                        encoding: 'utf8'
+                    })
+
+                    if (existingTags.includes(tagName)) {
+                        console.log(`⚠️  Tag ${tagName} 已存在，删除旧 tag`)
+                        execSync(`git tag -d ${tagName}`, { cwd: path.join(__dirname, '..') })
+                        // 尝试删除远程 tag（如果存在）
+                        try {
+                            execSync(`git push origin :refs/tags/${tagName}`, {
+                                cwd: path.join(__dirname, '..'),
+                                stdio: 'pipe'
+                            })
+                        } catch (e) {
+                            // 远程 tag 不存在，忽略错误
+                        }
+                    }
+
+                    execSync(`git tag ${tagName}`, { stdio: 'inherit', cwd: path.join(__dirname, '..') })
+                } catch (error) {
+                    throw new Error(`创建 tag 失败: ${error.message}`)
+                }
 
                 console.log('\n🚀 推送到远程仓库...')
                 execSync('git push', { stdio: 'inherit', cwd: path.join(__dirname, '..') })
