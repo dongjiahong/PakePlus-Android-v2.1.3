@@ -256,12 +256,12 @@ const updateBuildYml = async (tagName, releaseName, releaseBody) => {
 
 // set github env
 const setGithubEnv = (name, version, pubBody) => {
-    console.log('setGithubEnv......')
     const envPath = process.env.GITHUB_ENV
     if (!envPath) {
-        console.error('GITHUB_ENV is not defined')
+        console.log('ℹ️  跳过 GitHub 环境变量设置（仅在 GitHub Actions 中生效）')
         return
     }
+    console.log('设置 GitHub 环境变量...')
     try {
         const entries = {
             NAME: name,
@@ -273,13 +273,10 @@ const setGithubEnv = (name, version, pubBody) => {
                 fs.appendFileSync(envPath, `${key}=${value}\n`)
             }
         }
-        console.log('✅ Environment variables written to GITHUB_ENV')
-        // 查看env 变量
-        console.log(fs.readFileSync(envPath, 'utf-8'))
+        console.log('✅ GitHub 环境变量已写入')
     } catch (err) {
-        console.error('❌ Failed to parse config or write to GITHUB_ENV:', err)
+        console.error('❌ 写入 GitHub 环境变量失败:', err)
     }
-    console.log('setGithubEnv success')
 }
 
 // update android applicationId

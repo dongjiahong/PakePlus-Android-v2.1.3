@@ -1,0 +1,77 @@
+name: Android Build
+
+on:
+  push:
+    tags:
+      - '*-v*'  # 匹配如 aistudio-v0.0.1 这样的 tag
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    environment: GITHUB_TOKEN  # 使用你创建的 environment
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Run ppworker to prepare build
+        run: npm run pp:worker
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Build Release APK
+        run: ./gradlew assembleRelease
+
+      - name: Get tag name
+        id: tag_name
+        run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Get app info from config
+        id: app_info
+        run: |
+          APP_NAME=$(node -p "require('./scripts/ppconfig.json').android.showName")
+          APP_VERSION=$(node -p "require('./scripts/ppconfig.json').android.version")
+          APP_DESC=$(node -p "require('./scripts/ppconfig.json').android.pubBody")
+          echo "APP_NAME=${APP_NAME}" >> $GITHUB_OUTPUT
+          echo "APP_VERSION=${APP_VERSION}" >> $GITHUB_OUTPUT
+          echo "APP_DESC=${APP_DESC}" >> $GITHUB_OUTPUT
+
+      - name: Rename APK
+        run: |
+          cd app/build/outputs/apk/release
+          mv app-release-unsigned.apk ${{ steps.app_info.outputs.APP_NAME }}-v${{ steps.app_info.outputs.APP_VERSION }}.apk || \
+          mv app-release.apk ${{ steps.app_info.outputs.APP_NAME }}-v${{ steps.app_info.outputs.APP_VERSION }}.apk || true
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.tag_name.outputs.TAG_NAME }}
+          name: ${{ steps.app_info.outputs.APP_NAME }} v${{ steps.app_info.outputs.APP_VERSION }}
+          body: ${{ steps.app_info.outputs.APP_DESC }}
+          draft: false
+          prerelease: false
+          files: |
+            app/build/outputs/apk/release/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
