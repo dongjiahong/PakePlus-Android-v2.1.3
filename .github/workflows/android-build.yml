@@ -37,6 +37,16 @@ jobs:
       - name: Run ppworker to prepare build
         run: npm run pp:worker
 
+      - name: Generate signing keystore
+        run: |
+          keytool -genkeypair -v \
+            -keystore release.keystore \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -alias pakeplus_android \
+            -storepass pakeplus \
+            -keypass pakeplus \
+            -dname "CN=PakePlus, OU=Dev, O=PakePlus, L=City, S=State, C=CN"
+
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
@@ -60,7 +70,6 @@ jobs:
       - name: Rename APK
         run: |
           cd app/build/outputs/apk/release
-          mv app-release-unsigned.apk ${{ steps.app_info.outputs.APP_NAME }}-v${{ steps.app_info.outputs.APP_VERSION }}.apk || \
           mv app-release.apk ${{ steps.app_info.outputs.APP_NAME }}-v${{ steps.app_info.outputs.APP_VERSION }}.apk || true
 
       - name: Create Release
