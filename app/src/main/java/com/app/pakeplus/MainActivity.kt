@@ -114,7 +114,7 @@ class MainActivity : AppCompatActivity() {
             false
         }
 
-        webView.loadUrl("https://aistudio.google.com/apps")
+        webView.loadUrl("en.08082025.xyz")
         // webView.loadUrl("file:///android_asset/index.html")
 
 //        binding = ActivityMainBinding.inflate(layoutInflater)
