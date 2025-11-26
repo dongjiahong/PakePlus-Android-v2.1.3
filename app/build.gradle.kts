@@ -8,7 +8,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.echoback.djh"
+        applicationId = "com.scenelingo.djh"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
