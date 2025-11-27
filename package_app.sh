@@ -11,12 +11,16 @@ echo -e "${BLUE}========================================${NC}"
 echo -e "${BLUE}   PakePlus Android 打包脚本${NC}"
 echo -e "${BLUE}========================================${NC}\n"
 
-# 预设配置列表
-declare -A PRESETS
-PRESETS[1]="EchoBack|eb.08082025.xyz|../EchoBack/public/logo.svg|com.echoback.djh"
-PRESETS[2]="SceneLingo|scene.08082025.xyz|../SceneLingo/public/logo.svg|com.scenelingo.djh"
-PRESETS[3]="EasyFlomo|mo.08082025.xyz|../easyflomo/public/favicon.svg|com.easyflomo.djh"
-PRESETS[4]="OnlyReading|en.08082025.xyz|../novel/public/logo.svg|com.onlyreading.djh"
+# 预设配置列表（使用函数代替关联数组以兼容 Bash 3.2）
+get_preset() {
+    case "$1" in
+        1) echo "EchoBack|eb.08082025.xyz|../EchoBack/public/logo.svg|com.echoback.djh" ;;
+        2) echo "SceneLingo|scene.08082025.xyz|../SceneLingo/public/logo.svg|com.scenelingo.djh" ;;
+        3) echo "EasyFlomo|mo.08082025.xyz|../easyflomo/public/favicon.svg|com.easyflomo.djh" ;;
+        4) echo "OnlyReading|en.08082025.xyz|../novel/public/logo.svg|com.onlyreading.djh" ;;
+        *) echo "" ;;
+    esac
+}
 
 # 显示预设选项
 echo -e "${YELLOW}请选择打包配置:${NC}"
@@ -30,7 +34,8 @@ read -p "请输入选项 [1-5]: " choice
 
 if [[ "$choice" =~ ^[1-4]$ ]]; then
     # 使用预设配置
-    IFS='|' read -r app_name url icon app_flag <<< "${PRESETS[$choice]}"
+    preset_config=$(get_preset "$choice")
+    IFS='|' read -r app_name url icon app_flag <<< "$preset_config"
     echo -e "\n${GREEN}已选择预设:${NC} $app_name"
 else
     # 自定义配置
