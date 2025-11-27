@@ -148,7 +148,7 @@ class MainActivity : AppCompatActivity() {
             false
         }
 
-        webView.loadUrl("scene.08082025.xyz")
+        webView.loadUrl("en.08082025.xyz")
         // webView.loadUrl("file:///android_asset/index.html")
 
 //        binding = ActivityMainBinding.inflate(layoutInflater)
