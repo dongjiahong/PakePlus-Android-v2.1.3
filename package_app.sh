@@ -85,6 +85,13 @@ echo ""
 read -p "请输入版本号 [直接回车使用建议版本 $suggested_version]: " app_version
 app_version=${app_version:-$suggested_version}
 
+# 询问是否开启 debug 模式
+echo ""
+echo -e "${YELLOW}是否开启调试模式？${NC}"
+echo "开启后可在应用中查看 vConsole 调试面板"
+read -p "开启 debug 模式? [y/N]: " enable_debug
+enable_debug=${enable_debug:-N}
+
 # 验证必填参数
 if [[ -z "$app_name" ]] || [[ -z "$url" ]] || [[ -z "$icon" ]] || [[ -z "$app_flag" ]] || [[ -z "$app_version" ]]; then
     echo -e "\n${RED}错误: 所有参数都是必填的!${NC}"
@@ -100,6 +107,11 @@ echo -e "网站 URL: ${GREEN}$url${NC}"
 echo -e "图标路径: ${GREEN}$icon${NC}"
 echo -e "应用标识: ${GREEN}$app_flag${NC}"
 echo -e "版本号:   ${GREEN}$app_version${NC}"
+if [[ "$enable_debug" =~ ^[Yy]$ ]]; then
+    echo -e "调试模式: ${GREEN}开启${NC}"
+else
+    echo -e "调试模式: ${YELLOW}关闭${NC}"
+fi
 echo -e "${BLUE}========================================${NC}\n"
 
 read -p "确认开始打包? [Y/n]: " confirm
@@ -112,12 +124,22 @@ fi
 
 # 执行打包命令
 echo -e "\n${GREEN}开始打包...${NC}\n"
-npm run packplus -- \
-    --url "$url" \
-    --icon "$icon" \
-    --app-name "$app_name" \
-    --app-flag "$app_flag" \
-    --app-version "$app_version"
+
+# 构建基础命令
+packplus_cmd="npm run packplus -- \
+    --url \"$url\" \
+    --icon \"$icon\" \
+    --app-name \"$app_name\" \
+    --app-flag \"$app_flag\" \
+    --app-version \"$app_version\""
+
+# 如果开启 debug 模式，添加 --debug 参数
+if [[ "$enable_debug" =~ ^[Yy]$ ]]; then
+    packplus_cmd="$packplus_cmd --debug"
+fi
+
+# 执行命令
+eval $packplus_cmd
 
 # 检查执行结果
 if [ $? -eq 0 ]; then
