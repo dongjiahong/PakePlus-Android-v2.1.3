@@ -1,16 +1,21 @@
 package com.app.pakeplus
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.MotionEvent
+import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 // import android.view.Menu
 // import android.view.WindowInsets
 // import com.google.android.material.snackbar.Snackbar
@@ -34,6 +39,25 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
     private lateinit var gestureDetector: GestureDetectorCompat
+    private var filePathCallback: ValueCallback<Array<Uri>>? = null
+
+    private val fileChooserLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val results = result.data?.let { intent ->
+                intent.clipData?.let { clipData ->
+                    Array(clipData.itemCount) { i ->
+                        clipData.getItemAt(i).uri
+                    }
+                } ?: intent.data?.let { arrayOf(it) }
+            }
+            filePathCallback?.onReceiveValue(results)
+        } else {
+            filePathCallback?.onReceiveValue(null)
+        }
+        filePathCallback = null
+    }
 
     @SuppressLint("SetJavaScriptEnabled", "ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -109,8 +133,9 @@ class MainActivity : AppCompatActivity() {
             })
 
         // Set touch listener for WebView
-        webView.setOnTouchListener { _, event ->
+        webView.setOnTouchListener { view, event ->
             gestureDetector.onTouchEvent(event)
+            view.performClick()
             false
         }
 
@@ -210,6 +235,33 @@ class MainActivity : AppCompatActivity() {
             super.onProgressChanged(view, newProgress)
             val url = view?.url
             println("wev view url:$url")
+        }
+
+        override fun onShowFileChooser(
+            webView: WebView?,
+            filePathCallback: ValueCallback<Array<Uri>>?,
+            fileChooserParams: FileChooserParams?
+        ): Boolean {
+            // 清理之前的回调
+            this@MainActivity.filePathCallback?.onReceiveValue(null)
+            this@MainActivity.filePathCallback = filePathCallback
+
+            val intent = fileChooserParams?.createIntent() ?: Intent(Intent.ACTION_GET_CONTENT).apply {
+                type = "*/*"
+                addCategory(Intent.CATEGORY_OPENABLE)
+            }
+
+            // 支持多选
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, fileChooserParams?.mode == FileChooserParams.MODE_OPEN_MULTIPLE)
+
+            try {
+                fileChooserLauncher.launch(intent)
+            } catch (e: Exception) {
+                this@MainActivity.filePathCallback = null
+                return false
+            }
+
+            return true
         }
     }
 }
