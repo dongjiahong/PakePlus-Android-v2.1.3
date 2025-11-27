@@ -140,9 +140,9 @@
         "safeArea": "all"
     },
     "android": {
-        "name": "SceneLingo-v0.0.1",
+        "name": "SceneLingo-v0.0.2",
         "showName": "SceneLingo",
-        "version": "0.0.1",
+        "version": "0.0.2",
         "webUrl": "scene.08082025.xyz",
         "id": "com.scenelingo.djh",
         "icon": "/Users/lele/develop/vibe_coding/SceneLingo/public/logo.svg",
