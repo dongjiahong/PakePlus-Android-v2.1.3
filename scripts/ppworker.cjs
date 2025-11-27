@@ -154,12 +154,17 @@ const updateWebEnv = async (
             /webView\.loadUrl\(".*?"\)/,
             `webView.loadUrl("${webUrl}")`
         )
-        // if debug is true, add debug mode
+        // update debug mode
         console.log('webview debug to:', debug)
         if (debug) {
             updatedContent = updatedContent.replace(
                 'private var debug = false',
                 'private var debug = true'
+            )
+        } else {
+            updatedContent = updatedContent.replace(
+                'private var debug = true',
+                'private var debug = false'
             )
         }
 
