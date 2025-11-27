@@ -6,6 +6,8 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.webkit.ValueCallback
@@ -16,6 +18,11 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.FileProvider
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 // import android.view.Menu
 // import android.view.WindowInsets
 // import com.google.android.material.snackbar.Snackbar
@@ -40,6 +47,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var webView: WebView
     private lateinit var gestureDetector: GestureDetectorCompat
     private var filePathCallback: ValueCallback<Array<Uri>>? = null
+    private var cameraPhotoUri: Uri? = null
 
     private val fileChooserLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -51,12 +59,13 @@ class MainActivity : AppCompatActivity() {
                         clipData.getItemAt(i).uri
                     }
                 } ?: intent.data?.let { arrayOf(it) }
-            }
+            } ?: cameraPhotoUri?.let { arrayOf(it) }
             filePathCallback?.onReceiveValue(results)
         } else {
             filePathCallback?.onReceiveValue(null)
         }
         filePathCallback = null
+        cameraPhotoUri = null
     }
 
     @SuppressLint("SetJavaScriptEnabled", "ClickableViewAccessibility")
@@ -246,22 +255,59 @@ class MainActivity : AppCompatActivity() {
             this@MainActivity.filePathCallback?.onReceiveValue(null)
             this@MainActivity.filePathCallback = filePathCallback
 
-            val intent = fileChooserParams?.createIntent() ?: Intent(Intent.ACTION_GET_CONTENT).apply {
+            // 创建文件选择器 Intent
+            val contentSelectionIntent = Intent(Intent.ACTION_GET_CONTENT).apply {
                 type = "*/*"
                 addCategory(Intent.CATEGORY_OPENABLE)
+                // 支持多选
+                putExtra(Intent.EXTRA_ALLOW_MULTIPLE, fileChooserParams?.mode == FileChooserParams.MODE_OPEN_MULTIPLE)
             }
 
-            // 支持多选
-            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, fileChooserParams?.mode == FileChooserParams.MODE_OPEN_MULTIPLE)
+            // 创建相机 Intent
+            val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            if (takePictureIntent.resolveActivity(packageManager) != null) {
+                val photoFile = createImageFile()
+                photoFile?.let {
+                    cameraPhotoUri = FileProvider.getUriForFile(
+                        this@MainActivity,
+                        "${applicationContext.packageName}.fileprovider",
+                        it
+                    )
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, cameraPhotoUri)
+                }
+            }
+
+            // 创建选择器 Intent
+            val chooserIntent = Intent(Intent.ACTION_CHOOSER).apply {
+                putExtra(Intent.EXTRA_INTENT, contentSelectionIntent)
+                putExtra(Intent.EXTRA_TITLE, "选择图片")
+
+                // 添加相机选项
+                val intentArray = arrayOf(takePictureIntent)
+                putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)
+            }
 
             try {
-                fileChooserLauncher.launch(intent)
+                fileChooserLauncher.launch(chooserIntent)
             } catch (e: Exception) {
                 this@MainActivity.filePathCallback = null
+                cameraPhotoUri = null
                 return false
             }
 
             return true
+        }
+    }
+
+    private fun createImageFile(): File? {
+        return try {
+            val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+            val imageFileName = "JPEG_${timeStamp}_"
+            val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+            File.createTempFile(imageFileName, ".jpg", storageDir)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
     }
 }
