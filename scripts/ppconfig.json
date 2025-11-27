@@ -140,9 +140,9 @@
         "safeArea": "all"
     },
     "android": {
-        "name": "OnlyReading-v0.0.7",
+        "name": "OnlyReading-v0.0.8",
         "showName": "OnlyReading",
-        "version": "0.0.7",
+        "version": "0.0.8",
         "webUrl": "en.08082025.xyz",
         "id": "com.onlyreading.djh",
         "icon": "/Users/lele/develop/vibe_coding/novel/public/logo.svg",
@@ -154,7 +154,7 @@
         "desc": "Package for personal use only, please do not use for commercial purposes（打包仅限个人使用，请勿传播或商业用途）",
         "pubBody": "Package for personal use only, please do not use for commercial purposes（打包仅限个人使用，请勿传播或商业用途）",
         "isHtml": false,
-        "debug": true,
+        "debug": false,
         "safeArea": "all"
     },
     "desktop": {
