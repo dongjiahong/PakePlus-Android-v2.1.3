@@ -16,7 +16,7 @@ get_preset() {
     case "$1" in
         1) echo "EchoBack|eb.08082025.xyz|../EchoBack/public/logo.svg|com.echoback.djh" ;;
         2) echo "SceneLingo|scene.08082025.xyz|../SceneLingo/public/logo.svg|com.scenelingo.djh" ;;
-        3) echo "EasyFlomo|mo.08082025.xyz|../easyflomo/public/favicon.svg|com.easyflomo.djh" ;;
+        3) echo "EasyFlomo|mo.08082025.xyz|../EasyFlomo/public/logo.svg|com.easyflomo.djh" ;;
         4) echo "OnlyReading|en.08082025.xyz|../novel/public/logo.svg|com.onlyreading.djh" ;;
         *) echo "" ;;
     esac
