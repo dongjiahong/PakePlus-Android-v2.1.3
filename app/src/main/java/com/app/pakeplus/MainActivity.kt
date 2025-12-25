@@ -201,7 +201,7 @@ class MainActivity : AppCompatActivity() {
     inner class MyWebViewClient : WebViewClient() {
 
         // vConsole debug
-        private var debug = true
+        private var debug = false
 
         @Deprecated("Deprecated in Java", ReplaceWith("false"))
         override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
