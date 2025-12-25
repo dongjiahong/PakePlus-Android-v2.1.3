@@ -18,6 +18,7 @@ get_preset() {
         2) echo "SceneLingo|scene.08082025.xyz|../SceneLingo/public/logo.svg|com.scenelingo.djh" ;;
         3) echo "EasyFlomo|mo.08082025.xyz|../EasyFlomo/public/logo.svg|com.easyflomo.djh" ;;
         4) echo "OnlyReading|en.08082025.xyz|../novel/public/logo.svg|com.onlyreading.djh" ;;
+        5) echo "LifeHabits|habits.08082025.xyz|../LifeHabits/public/favicon.svg|com.lifehabits.djh" ;;
         *) echo "" ;;
     esac
 }
@@ -28,11 +29,12 @@ echo "1) EchoBack"
 echo "2) SceneLingo"
 echo "3) EasyFlomo"
 echo "4) OnlyReading"
-echo "5) 自定义配置"
+echo "5) LifeHabits"
+echo "6) 自定义配置"
 echo ""
-read -p "请输入选项 [1-5]: " choice
+read -p "请输入选项 [1-6]: " choice
 
-if [[ "$choice" =~ ^[1-4]$ ]]; then
+if [[ "$choice" =~ ^[1-5]$ ]]; then
     # 使用预设配置
     preset_config=$(get_preset "$choice")
     IFS='|' read -r app_name url icon app_flag <<< "$preset_config"

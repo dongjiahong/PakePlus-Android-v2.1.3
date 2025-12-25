@@ -140,13 +140,13 @@
         "safeArea": "all"
     },
     "android": {
-        "name": "EasyFlomo-v0.0.5",
-        "showName": "EasyFlomo",
-        "version": "0.0.5",
-        "webUrl": "mo.08082025.xyz",
-        "id": "com.easyflomo.djh",
-        "icon": "/Users/lele/develop/vibe_coding/easyflomo/public/favicon.svg",
-        "input": "/Users/lele/develop/vibe_coding/easyflomo/public/favicon.svg",
+        "name": "LifeHabits-v0.0.1",
+        "showName": "LifeHabits",
+        "version": "0.0.1",
+        "webUrl": "habits.08082025.xyz",
+        "id": "com.lifehabits.djh",
+        "icon": "/Users/lele/develop/vibe_coding/LifeHabits/public/favicon.svg",
+        "input": "/Users/lele/develop/vibe_coding/LifeHabits/public/favicon.svg",
         "output": "./res",
         "rounded": true,
         "copyTo": "./app/src/main/res",
@@ -154,7 +154,7 @@
         "desc": "Package for personal use only, please do not use for commercial purposes（打包仅限个人使用，请勿传播或商业用途）",
         "pubBody": "Package for personal use only, please do not use for commercial purposes（打包仅限个人使用，请勿传播或商业用途）",
         "isHtml": false,
-        "debug": false,
+        "debug": true,
         "safeArea": "all"
     },
     "desktop": {
