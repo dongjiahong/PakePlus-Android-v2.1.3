@@ -1,1 +1,1 @@
-npm run packplus -- --url "https://docs.craft.do/s/%E6%88%91%E7%9A%84%E7%A9%BA%E9%97%B4--da63cef1-14c8-534a-39b5-cc70f5d5023c/tasks/inbox" --icon ./scripts/assets/craft-icon.png --app-name Craft --app-flag com.craft.djh --app-version 0.0.1
+npm run packplus -- --url "https://docs.craft.do/s/%E6%88%91%E7%9A%84%E7%A9%BA%E9%97%B4--da63cef1-14c8-534a-39b5-cc70f5d5023c/tasks/inbox" --icon ./scripts/assets/craft-icon.png --app-name Craft --app-flag com.craft.djh --app-version 0.0.2

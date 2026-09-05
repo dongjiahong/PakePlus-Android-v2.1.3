@@ -4,35 +4,40 @@ const sharp = require('sharp')
 const ppconfig = require('./ppconfig.json')
 
 async function generateAdaptiveIcons(input, output) {
+    // Adaptive icon layers must be 108dp. 48dp legacy sizes get upscaled by
+    // the launcher and look blurry on modern Android.
     const densities = {
-        'mipmap-mdpi': 48,
-        'mipmap-hdpi': 72,
-        'mipmap-xhdpi': 96,
-        'mipmap-xxhdpi': 144,
-        'mipmap-xxxhdpi': 192,
+        'mipmap-mdpi': { legacy: 48, adaptive: 108 },
+        'mipmap-hdpi': { legacy: 72, adaptive: 162 },
+        'mipmap-xhdpi': { legacy: 96, adaptive: 216 },
+        'mipmap-xxhdpi': { legacy: 144, adaptive: 324 },
+        'mipmap-xxxhdpi': { legacy: 192, adaptive: 432 },
     }
 
     // icon背景颜色,可设置为none透明
     const bgColor = '#FFFFFF'
-    // 一般0.75, 前景最大占比（安全区）
-    const foregroundScale = 0.68
+    // Adaptive icon safe zone is the inner 72/108 ≈ 0.67
+    const foregroundScale = 0.72
 
     if (!fs.existsSync(output)) {
         fs.mkdirSync(output, { recursive: true })
     }
 
-    for (const [folder, size] of Object.entries(densities)) {
+    for (const [folder, sizes] of Object.entries(densities)) {
         const dir = path.join(output, folder)
         if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
 
+        const { legacy, adaptive } = sizes
         const backgroundFile = path.join(dir, 'ic_launcher_background.png')
         const foregroundFile = path.join(dir, 'ic_launcher_foreground.png')
+        const launcherFile = path.join(dir, 'ic_launcher.png')
+        const launcherRoundFile = path.join(dir, 'ic_launcher_round.png')
 
         // 使用 sharp 生成背景：纯色填充
         await sharp({
             create: {
-                width: size,
-                height: size,
+                width: adaptive,
+                height: adaptive,
                 channels: 4,
                 background: bgColor
             }
@@ -40,24 +45,41 @@ async function generateAdaptiveIcons(input, output) {
         .png()
         .toFile(backgroundFile)
 
-        // 前景大小 = 图标尺寸 × 前景缩放比例
-        const fgSize = Math.round(size * foregroundScale)
-
-        // 使用 sharp 生成前景：缩放到安全区域，居中，四周自动留边
-        await sharp(input)
+        // 前景大小 = 自适应画布 × 前景缩放比例
+        const fgSize = Math.round(adaptive * foregroundScale)
+        const left = Math.floor((adaptive - fgSize) / 2)
+        const top = Math.floor((adaptive - fgSize) / 2)
+        const fgBuffer = await sharp(input)
             .resize(fgSize, fgSize, {
                 fit: 'contain',
-                background: { r: 0, g: 0, b: 0, alpha: 0 }
-            })
-            .extend({
-                top: Math.round((size - fgSize) / 2),
-                bottom: Math.round((size - fgSize) / 2),
-                left: Math.round((size - fgSize) / 2),
-                right: Math.round((size - fgSize) / 2),
+                kernel: 'lanczos3',
                 background: { r: 0, g: 0, b: 0, alpha: 0 }
             })
             .png()
+            .toBuffer()
+
+        await sharp({
+            create: {
+                width: adaptive,
+                height: adaptive,
+                channels: 4,
+                background: { r: 0, g: 0, b: 0, alpha: 0 }
+            }
+        })
+            .composite([{ input: fgBuffer, left, top }])
+            .png()
             .toFile(foregroundFile)
+
+        // Legacy launcher icons for API < 26 and some OEM launchers
+        await sharp(input)
+            .resize(legacy, legacy, {
+                fit: 'contain',
+                kernel: 'lanczos3',
+                background: { r: 0, g: 0, b: 0, alpha: 0 }
+            })
+            .png()
+            .toFile(launcherFile)
+        await fs.copy(launcherFile, launcherRoundFile)
     }
 
     // 生成 Adaptive Icon XML (放到 mipmap-anydpi-v26)
@@ -71,6 +93,7 @@ async function generateAdaptiveIcons(input, output) {
 </adaptive-icon>`
 
     fs.writeFileSync(path.join(anydpiDir, 'ic_launcher.xml'), xml, 'utf-8')
+    fs.writeFileSync(path.join(anydpiDir, 'ic_launcher_round.xml'), xml, 'utf-8')
 
     console.log('✅ Adaptive Icons 已生成:', output)
 }
