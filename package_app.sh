@@ -19,6 +19,7 @@ get_preset() {
         3) echo "EasyFlomo|mo.08082025.xyz|../EasyFlomo/public/logo.svg|com.easyflomo.djh" ;;
         4) echo "OnlyReading|en.08082025.xyz|../novel/public/logo.svg|com.onlyreading.djh" ;;
         5) echo "LifeHabits|habits.08082025.xyz|../LifeHabits/public/favicon.svg|com.lifehabits.djh" ;;
+        6) echo "Craft|https://docs.craft.do/s/%E6%88%91%E7%9A%84%E7%A9%BA%E9%97%B4--da63cef1-14c8-534a-39b5-cc70f5d5023c/tasks/inbox|./scripts/assets/craft-icon.png|com.craft.djh" ;;
         *) echo "" ;;
     esac
 }
@@ -30,11 +31,12 @@ echo "2) SceneLingo"
 echo "3) EasyFlomo"
 echo "4) OnlyReading"
 echo "5) LifeHabits"
-echo "6) 自定义配置"
+echo "6) Craft"
+echo "7) 自定义配置"
 echo ""
-read -p "请输入选项 [1-6]: " choice
+read -p "请输入选项 [1-7]: " choice
 
-if [[ "$choice" =~ ^[1-5]$ ]]; then
+if [[ "$choice" =~ ^[1-6]$ ]]; then
     # 使用预设配置
     preset_config=$(get_preset "$choice")
     IFS='|' read -r app_name url icon app_flag <<< "$preset_config"
