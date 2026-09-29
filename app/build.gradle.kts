@@ -8,7 +8,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.craft.djh"
+        applicationId = "com.axiom.djh"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
