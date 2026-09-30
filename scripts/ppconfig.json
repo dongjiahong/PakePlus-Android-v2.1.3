@@ -140,13 +140,13 @@
         "safeArea": "all"
     },
     "android": {
-        "name": "Axiom-v0.0.1",
+        "name": "Axiom-v0.0.2",
         "showName": "Axiom",
-        "version": "0.0.1",
+        "version": "0.0.2",
         "webUrl": "https://axiom.aidan.dpdns.org/",
         "id": "com.axiom.djh",
-        "icon": "/Users/lele/develop/vibe_coding/Axiom/src/app/icon.svg",
-        "input": "/Users/lele/develop/vibe_coding/Axiom/src/app/icon.svg",
+        "icon": "/Users/lele/Downloads/axiom-icons/android/PlayStore-512.png",
+        "input": "/Users/lele/Downloads/axiom-icons/android/PlayStore-512.png",
         "output": "./res",
         "rounded": true,
         "copyTo": "./app/src/main/res",
